@@ -6,6 +6,7 @@ use Aws\Textract\TextractClient;
 use Aws\Exception\AwsException;
 use App\Models\PayslipExtraction;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class PayslipExtractionService
 {
@@ -28,8 +29,7 @@ class PayslipExtractionService
      */
     public function extractTextFromFile(string $filePath): string
     {
-        $fullPath = storage_path("app/public/$filePath");
-        $fileContent = file_get_contents($fullPath);
+        $fileContent = Storage::disk('public')->get($filePath);
 
         try {
             $result = $this->textract->analyzeDocument([
