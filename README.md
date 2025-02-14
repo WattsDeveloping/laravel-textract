@@ -1,66 +1,112 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Payslip Extraction API
+@Author Michael Watts
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This API allows you to upload a PDF file containing payslip data, extract text from it using AWS Textract, and store the extracted data in a database.
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Before you get started, ensure you have the following installed:
+- PHP (Laravel framework)
+- Composer
+- AWS SDK for PHP (already included in this project)
+- AWS Access Key ID and Secret Access Key (Contact me if you need access)
+- Postman (for testing the API)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Getting Started
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Install Depencies
 
-## Learning Laravel
+First, clone the repository to your local machine:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+cd payslip-extraction-api
+composer install
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 2. Set Up Environment Variables
+```bash
+cp .env.example .env
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1  # or your preferred AWS region
+```
 
-## Laravel Sponsors
+### 3. Migrate the Database
+```bash
+php artisan migrate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. Start laravel Development Server (I use Herd personally)
+```bash
+php artisan serve
+```
+## Making API Requests with Postman
 
-### Premium Partners
+### 1. Open Postman
+If you don't have Postman installed, you can download it from [here](https://www.postman.com/downloads/).
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 2. Set Up the API Request
+In Postman, follow these steps to make a request to the Payslip Extraction API:
 
-## Contributing
+- **Method:** `POST`
+- **URL:** `http://localhost:8000/api/payslip/upload`
+- **Headers:** No specific headers are required, but ensure you set the correct `Content-Type`.
+- **Body:** Select `form-data` and add the following field:
+    - **Key:** `file`
+    - **Value:** Choose the file from your local machine (a PDF file)
+    - **Type:** `File`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Send the Request
+Click "Send" in Postman, and you should receive a response with the extracted text from the PDF.
 
-## Code of Conduct
+### 4. Sample PaySlip File
+You can find a sample payslip PDF file, sample_payslip.pdf, located in the root directory of the project. This file can be used for testing the payslip extraction API.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Example Response:**
 
-## Security Vulnerabilities
+```json
+{
+  "message": "Text extracted and saved successfully",
+  "text": "Extracted text from the payslip PDF..."
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Set Up Testing Environment
+### 1. Copy the .env file to create a .env.testing file:
+```bash
+cp .env .env.testing
 
-## License
+DB_CONNECTION=mysql
+DB_DATABASE=laravel_textract_testing
+DB_USERNAME=root
+DB_PASSWORD=
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1
+```
+
+### 2. Running Tests
+```bash
+php artisan test
+php artisan test --filter PayslipExtractionTest
+```
+
+## Future Improvements
+
+### 1. Store Files on Amazon S3
+Currently, I'm storing files locally using Laravel's default storage. However, in a production environment, it's more efficient and scalable to store files on Amazon S3.
+
+### 2. Save Extracted Text as JSON
+If the end user knows the specific structure of the PDF (e.g., consistent fields for "Employee Name," "Salary," "Date," etc.), it would be more efficient to parse and save the text as JSON for better querying and manipulation.
+
+### 3. Improved Error Handling
+I could improve error handling to catch more specific AWS Textract errors and provide clearer messages to the API consumers. This would involve refining exception handling in the PayslipExtractionService and possibly adding retry
+logic for AWS service failures.
+
+### 4. API Rate Limits
+AWS Textract may have rate limits, which could affect your requests. I could implement error handling for rate-limiting scenarios, especially when processing multiple files in a short time frame.
+
+### 5. Further tests
+If I had more time I could have added tests to mock AWS analyzeDocument
