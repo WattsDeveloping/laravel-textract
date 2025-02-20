@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExtractPayslipRequest;
 use App\Services\PayslipExtractionService;
 use App\Helpers\FileHelper;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class PayslipExtractionController extends Controller
@@ -16,14 +16,10 @@ class PayslipExtractionController extends Controller
         $this->payslipExtractionService = $payslipExtractionService;
     }
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(ExtractPayslipRequest $request): JsonResponse
     {
-        $request->validate([
-            'file' => 'required|file|mimes:pdf|max:5120',
-        ]);
-
-        $file = $request->file('file');
-        $filePath = FileHelper::storeFile($file);
+        $file = $request->file(key: 'file');
+        $filePath = FileHelper::storeFile(file: $file);
 
         try {
             $extractedText = $this->payslipExtractionService->extractTextFromFile(filePath: $filePath);
